@@ -370,7 +370,3 @@ See [LICENSE](LICENSE) file for details.
 ## 📧 Contact
 
 For questions or issues, please open a GitHub issue.
-
----
-
-**Built with ❤️ for intelligent loan analysis**
