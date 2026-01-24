@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from .models import QueryRequest, QueryResponse, HealthResponse, UploadResponse
+from .models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse
 from .api import loan_api
 import shutil
 import os
@@ -10,6 +10,14 @@ router = APIRouter()
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
     return HealthResponse(status="healthy", version="1.0.0")
+
+@router.get("/dashboard-stats", response_model=DashboardStatsResponse)
+async def get_dashboard_stats():
+    try:
+        stats = loan_api.get_dashboard_stats()
+        return DashboardStatsResponse(**stats)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching dashboard stats: {str(e)}")
 
 @router.post("/query-loan-insights", response_model=QueryResponse)
 async def query_insights(request: QueryRequest):

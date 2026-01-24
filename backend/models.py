@@ -27,3 +27,17 @@ class UploadResponse(BaseModel):
     filename: str
     records_processed: int
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+class StatItem(BaseModel):
+    name: str
+    value: Any
+    color: Optional[str] = None
+
+class DashboardStatsResponse(BaseModel):
+    total_loans: int
+    approval_rate: float
+    avg_cibil: float
+    avg_loan_amount: float
+    loan_status_distribution: List[StatItem]
+    loan_type_distribution: List[StatItem]
+    recent_applications: List[Dict[str, Any]]
