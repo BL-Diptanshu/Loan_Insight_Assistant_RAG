@@ -5,6 +5,7 @@ from groq import Groq
 from pydantic import ValidationError
 
 from ..schemas import QueryIntentSchema, IntentType, ComplianceTone
+from ..prompts import QUERY_ANALYSIS_PROMPT
 
 class QueryUnderstandingAgent:
     def __init__(self, model_name: str = "llama-3.3-70b-versatile", api_key: Optional[str] = None):
@@ -20,28 +21,7 @@ class QueryUnderstandingAgent:
         if not self.client:
             return self._fallback_intent(query)
 
-        prompt = f"""
-You are an expert Loan Query Understanding Agent.
-Your goal is to analyze the user's query and extract structured intent information.
-
-USER QUERY: "{query}"
-
-Output must be a valid JSON object matching this structure:
-{{
-    "intent": "allowed_values: why_rejected, why_approved, similar_cases, risk_analysis, audit_reason, general_inquiry",
-    "loan_id": "extracted loan ID if present, else null",
-    "filters": {{ "field": "value" }} (extract constraints like amount > 50000, term=short),
-    "top_k_hint": integer (implied number of cases to find, default 5),
-    "compliance_tone": "allowed_values: audit, business, neutral",
-    "confidence_score": float (0.0 to 1.0)
-}}
-
-Rules:
-1. If the user asks "Why was loan X rejected?", intent is "why_rejected" and loan_id is "X".
-2. If the user asks for "similar cases", intent is "similar_cases".
-3. If the user mentions "audit" or "compliance", set compliance_tone to "audit".
-4. Return ONLY JSON.
-"""
+        prompt = QUERY_ANALYSIS_PROMPT.format(query=query)
 
         try:
             response = self.client.chat.completions.create(
