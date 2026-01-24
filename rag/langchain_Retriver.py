@@ -1,299 +1,372 @@
 """
-Pipeline Orchestrator
-Main script that orchestrates the entire RAG pipeline using modular components
+LangChain RAG Retriever Module
+Implements LangChain integration for semantic retrieval with query routing
 """
 
+from typing import List, Dict, Tuple, Optional
+import numpy as np
+import pandas as pd
+from dataclasses import dataclass
 import json
-import os
-import sys
-from datetime import datetime
-from pathlib import Path
-import warnings
-warnings.filterwarnings('ignore')
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from data_loader import LoanDataLoader
-from text_processor import LoanTextProcessor
-from embedding_generator import EmbeddingGenerator
-from vector_store import FAISSVectorStore
+from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
+from langchain_core.vectorstores import VectorStore
+import faiss
 
 
-class LoanRAGPipeline:
-    """Orchestrate the complete RAG pipeline"""
+@dataclass
+class RetrievalResult:
+    """Data class for retrieval results"""
+    query: str
+    documents: List[Document]
+    scores: List[float]
+    indices: List[int]
+    metadata: Dict
     
-    def __init__(self, csv_path, output_dir='./output', 
-                 model_name='sentence-transformers/all-MiniLM-L6-v2'):
+    def to_dict(self):
+        """Convert to dictionary for serialization"""
+        return {
+            'query': self.query,
+            'num_results': len(self.documents),
+            'documents': [
+                {
+                    'content': doc.page_content,
+                    'metadata': doc.metadata,
+                    'score': float(score)
+                }
+                for doc, score in zip(self.documents, self.scores)
+            ],
+            'metadata': self.metadata
+        }
+
+
+class LoanEmbeddings(Embeddings):
+    """LangChain-compatible embedding wrapper for Sentence Transformers"""
+    
+    def __init__(self, embedding_generator):
         """
-        Initialize the pipeline
+        Initialize with embedding generator
         
         Parameters:
         -----------
-        csv_path : str
-            Path to the loan dataset CSV file
-        output_dir : str
-            Directory to save output artifacts
-        model_name : str
-            Name of the sentence transformer model to use
+        embedding_generator : EmbeddingGenerator
+            The embedding generator instance
         """
-        self.csv_path = csv_path
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
-        self.model_name = model_name
+        self.embedding_generator = embedding_generator
         
-        # Initialize components
-        self.data_loader = None
-        self.text_processor = None
-        self.embedding_generator = None
-        self.vector_store = None
-        
-        # Data storage
-        self.df = None
-        self.processed_df = None
-        self.texts = None
-        self.embeddings = None
-        
-        # Validation report
-        self.validation_report = {}
-        
-    def run_full_pipeline(self):
-        """Execute the complete RAG pipeline"""
-        print("🚀 Starting RAG Pipeline for Loan Insight Assistant")
-        print("="*80)
-        
-        # Step 1: Load and validate data
-        self._load_data()
-        
-        # Step 2: Process texts
-        self._process_texts()
-        
-        # Step 3: Generate embeddings
-        self._generate_embeddings()
-        
-        # Step 4: Create vector store
-        self._create_vector_store()
-        
-        # Step 5: Save artifacts
-        self._save_artifacts()
-        
-        # Step 6: Test the system
-        self._test_search()
-        
-        print("\n" + "="*80)
-        print("✅ Pipeline completed successfully!")
-        print(f"📁 All outputs saved to: {self.output_dir}")
-        print("="*80)
-        
-        return self
-    
-    def _load_data(self):
-        """Step 1: Load data"""
-        print("\n" + "="*80)
-        print("STEP 1: DATA LOADING")
-        print("="*80)
-        
-        self.data_loader = LoanDataLoader(self.csv_path)
-        self.data_loader.load_data()
-        
-        self.df = self.data_loader.get_dataframe()
-        
-        # Store basic info
-        self.validation_report['total_records'] = len(self.df)
-        self.validation_report['total_columns'] = len(self.df.columns)
-        
-        return self
-    
-    def _process_texts(self):
-        """Step 2: Process texts and create representations"""
-        print("\n" + "="*80)
-        print("STEP 2: TEXT PROCESSING AND FEATURE ENGINEERING")
-        print("="*80)
-        
-        self.text_processor = LoanTextProcessor(self.df)
-        self.text_processor.create_text_representations()
-        
-        self.processed_df = self.text_processor.get_processed_dataframe()
-        self.texts = self.text_processor.get_text_representations()
-        
-        # Store basic metadata
-        self.validation_report['total_texts'] = len(self.texts)
-        self.validation_report['avg_text_length'] = int(sum(len(t) for t in self.texts) / len(self.texts))
-        
-        return self
-    
-    def _generate_embeddings(self):
-        """Step 3: Generate embeddings"""
-        print("\n" + "="*80)
-        print("STEP 3: EMBEDDING GENERATION")
-        print("="*80)
-        
-        self.embedding_generator = EmbeddingGenerator(self.model_name)
-        self.embeddings = self.embedding_generator.generate_embeddings(
-            self.texts,
-            batch_size=32,
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Embed search docs (batch)"""
+        embeddings = self.embedding_generator.generate_embeddings(
+            texts,
             normalize=True,
-            show_progress=True
+            show_progress=False
+        )
+        return embeddings.tolist()
+    
+    def embed_query(self, text: str) -> List[float]:
+        """Embed query (single)"""
+        embedding = self.embedding_generator.encode_query(text, normalize=True)
+        return embedding[0].tolist()
+
+
+class LoanFAISSVectorStore(VectorStore):
+    """LangChain-compatible FAISS vector store for loan data"""
+    
+    def __init__(self, embedding_function: Embeddings, index: faiss.Index, 
+                 documents: List[Document], embedding_array: np.ndarray):
+        """
+        Initialize FAISS vector store
+        
+        Parameters:
+        -----------
+        embedding_function : Embeddings
+            LangChain embeddings instance
+        index : faiss.Index
+            FAISS index
+        documents : List[Document]
+            List of LangChain documents
+        embedding_array : np.ndarray
+            Embedding array
+        """
+        self.embedding_function = embedding_function
+        self.index = index
+        self.documents = documents
+        self._embedding_array = embedding_array
+        
+    def add_documents(self, documents: List[Document], **kwargs) -> None:
+        """Add documents (not implemented for existing index)"""
+        raise NotImplementedError("Use LoanRAGRetriever.create_from_embeddings()")
+    
+    def add_texts(self, texts: List[str], metadatas: List[dict] = None, **kwargs) -> List[str]:
+        """Add texts (not implemented for existing index)"""
+        raise NotImplementedError("Use LoanRAGRetriever.create_from_embeddings()")
+    
+    @classmethod
+    def from_texts(cls, texts: List[str], embedding: Embeddings, **kwargs) -> "LoanFAISSVectorStore":
+        """Create from texts (not supported - use from_embeddings)"""
+        raise NotImplementedError("Use from_embeddings() instead")
+    
+    def similarity_search(self, query: str, k: int = 5, **kwargs) -> List[Document]:
+        """Search for similar documents"""
+        query_embedding = self.embedding_function.embed_query(query)
+        query_embedding = np.array([query_embedding]).astype('float32')
+        
+        distances, indices = self.index.search(query_embedding, k)
+        
+        return [self.documents[i] for i in indices[0] if i >= 0]
+    
+    def similarity_search_with_score(self, query: str, k: int = 5, 
+                                     **kwargs) -> List[Tuple[Document, float]]:
+        """Search for similar documents with scores"""
+        query_embedding = self.embedding_function.embed_query(query)
+        query_embedding = np.array([query_embedding]).astype('float32')
+        
+        distances, indices = self.index.search(query_embedding, k)
+        
+        results = []
+        for score, idx in zip(distances[0], indices[0]):
+            if idx >= 0:
+                results.append((self.documents[idx], float(score)))
+        
+        return results
+    
+    @classmethod
+    def from_embeddings(cls, texts: List[str], embeddings: Embeddings, 
+                       df: pd.DataFrame, index: faiss.Index, 
+                       embedding_array: np.ndarray) -> "LoanFAISSVectorStore":
+        """Create vector store from texts and embeddings"""
+        # Create LangChain documents
+        documents = []
+        for i, text in enumerate(texts):
+            metadata = {
+                'index': i,
+                **{col: str(val) for col, val in df.iloc[i].items()}
+            }
+            doc = Document(page_content=text, metadata=metadata)
+            documents.append(doc)
+        
+        return cls(embeddings, index, documents, embedding_array)
+
+
+class LoanRAGRetriever:
+    """
+    LangChain-based RAG Retriever for Loan Insight Assistant
+    Provides semantic search with optional query routing for accuracy
+    """
+    
+    def __init__(self, vector_store: LoanFAISSVectorStore, 
+                 embedding_generator, df: pd.DataFrame):
+        """
+        Initialize RAG retriever
+        
+        Parameters:
+        -----------
+        vector_store : LoanFAISSVectorStore
+            The vector store instance
+        embedding_generator : EmbeddingGenerator
+            The embedding generator instance
+        df : pd.DataFrame
+            Original dataframe for context
+        """
+        self.vector_store = vector_store
+        self.embedding_generator = embedding_generator
+        self.df = df
+        self.retrieval_history = []
+        
+    def retrieve(self, query: str, k: int = 5, 
+                return_score: bool = True) -> RetrievalResult:
+        """
+        Retrieve similar loan records for a query
+        
+        Parameters:
+        -----------
+        query : str
+            The search query
+        k : int
+            Number of results to retrieve
+        return_score : bool
+            Whether to return similarity scores
+            
+        Returns:
+        --------
+        RetrievalResult
+            Result object containing documents, scores, and metadata
+        """
+        print(f"\n[SEARCH] Retrieving documents for query: '{query}'")
+        
+        if return_score:
+            results = self.vector_store.similarity_search_with_score(query, k=k)
+            documents = [doc for doc, _ in results]
+            scores = [score for _, score in results]
+        else:
+            documents = self.vector_store.similarity_search(query, k=k)
+            scores = [None] * len(documents)
+        
+        indices = [doc.metadata.get('index', -1) for doc in documents]
+        
+        # Store in history
+        result = RetrievalResult(
+            query=query,
+            documents=documents,
+            scores=scores,
+            indices=indices,
+            metadata={
+                'k': k,
+                'num_results': len(documents),
+                'embedding_model': self.embedding_generator.model_name
+            }
         )
         
-        # Update validation report
-        self.validation_report.update(self.embedding_generator.get_metadata())
+        self.retrieval_history.append(result)
         
-        return self
+        return result
     
-    def _create_vector_store(self):
-        """Step 4: Create FAISS vector store"""
-        print("\n" + "="*80)
-        print("STEP 4: VECTOR STORE CREATION")
-        print("="*80)
+    def retrieve_batch(self, queries: List[str], k: int = 5) -> List[RetrievalResult]:
+        """
+        Retrieve for multiple queries
         
-        self.vector_store = FAISSVectorStore()
-        
-        # Choose index type based on dataset size
-        index_type = 'flat' if len(self.embeddings) < 10000 else 'ivf'
-        
-        self.vector_store.create_index(
-            self.embeddings,
-            index_type=index_type,
-            nlist=100,
-            nprobe=10
-        )
-        
-        # Update validation report
-        self.validation_report.update(self.vector_store.get_metadata())
-        
-        return self
+        Parameters:
+        -----------
+        queries : List[str]
+            List of queries
+        k : int
+            Number of results per query
+            
+        Returns:
+        --------
+        List[RetrievalResult]
+            List of retrieval results
+        """
+        print(f"\n[SEARCH] Batch retrieving for {len(queries)} queries...")
+        results = [self.retrieve(query, k=k) for query in queries]
+        return results
     
-    def _save_artifacts(self):
-        """Step 5: Save all artifacts to disk"""
-        print("\n" + "="*80)
-        print("STEP 5: SAVING ARTIFACTS")
-        print("="*80)
-        print("\n💾 Saving artifacts...")
+    def explain_retrieval(self, result: RetrievalResult) -> Dict:
+        """
+        Provide detailed explanation of retrieval results
         
-        # 1. Save processed CSV with text representations
-        csv_path = self.output_dir / 'processed_loan_data_with_embeddings.csv'
-        self.processed_df.to_csv(csv_path, index=False)
-        print(f"   ✅ Saved processed CSV: {csv_path}")
-        
-        # 2. Save FAISS index
-        index_path = self.output_dir / 'loan_faiss_index.bin'
-        self.vector_store.save_index(index_path)
-        
-        # 3. Save embeddings
-        embeddings_path = self.output_dir / 'loan_embeddings.npy'
-        self.embedding_generator.save_embeddings(embeddings_path)
-        
-        # 4. Save validation report
-        self.validation_report['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.validation_report['artifacts'] = {
-            'processed_csv': str(csv_path),
-            'faiss_index': str(index_path),
-            'embeddings': str(embeddings_path)
+        Parameters:
+        -----------
+        result : RetrievalResult
+            The retrieval result to explain
+            
+        Returns:
+        --------
+        Dict
+            Explanation with analysis
+        """
+        explanation = {
+            'query': result.query,
+            'interpretation': self._interpret_query(result.query),
+            'num_results_returned': len(result.documents),
+            'similarity_scores': [float(s) for s in result.scores if s is not None],
+            'documents_summary': []
         }
         
-        report_path = self.output_dir / 'validation_report.json'
-        with open(report_path, 'w') as f:
-            json.dump(self.validation_report, f, indent=2)
-        print(f"   ✅ Saved validation report: {report_path}")
+        for doc, score in zip(result.documents, result.scores):
+            doc_summary = {
+                'customer': doc.metadata.get('Customer_Name', 'Unknown'),
+                'loan_amount': doc.metadata.get('Loan_Amount', 'Unknown'),
+                'status': doc.metadata.get('Application_Status', 'Unknown'),
+                'similarity_score': float(score) if score else None,
+                'key_attributes': {}
+            }
+            
+            # Extract key attributes
+            for key in ['Age', 'Annual_Income', 'Credit_Score', 'Employment_Status']:
+                if key in doc.metadata:
+                    doc_summary['key_attributes'][key] = doc.metadata[key]
+            
+            explanation['documents_summary'].append(doc_summary)
         
-        # 5. Create human-readable report
-        txt_report_path = self.output_dir / 'validation_report.txt'
-        self._create_text_report(txt_report_path)
-        print(f"   ✅ Saved text report: {txt_report_path}")
-        
-        return self
+        return explanation
     
-    def _create_text_report(self, path):
-        """Create a human-readable text report"""
-        with open(path, 'w') as f:
-            f.write("="*80 + "\n")
-            f.write("LOAN INSIGHT ASSISTANT - PIPELINE EXECUTION REPORT\n")
-            f.write("="*80 + "\n\n")
+    def _interpret_query(self, query: str) -> Dict:
+        """
+        Interpret query to understand intent
+        
+        Parameters:
+        -----------
+        query : str
+            The query to interpret
             
-            f.write(f"Generated: {self.validation_report.get('timestamp', 'N/A')}\n\n")
-            
-            # Data Overview
-            f.write("1. DATA OVERVIEW\n")
-            f.write("-" * 80 + "\n")
-            f.write(f"Total Records: {self.validation_report.get('total_records', 'N/A')}\n")
-            f.write(f"Total Columns: {self.validation_report.get('total_columns', 'N/A')}\n")
-            f.write(f"Data Quality: {self.validation_report.get('data_quality_score', 'N/A')}\n\n")
-            
-            # Text Processing
-            f.write("2. TEXT PROCESSING\n")
-            f.write("-" * 80 + "\n")
-            f.write(f"Total Texts: {self.validation_report.get('total_texts', 'N/A')}\n")
-            f.write(f"Average Length: {self.validation_report.get('avg_text_length', 'N/A'):.0f} chars\n\n")
-            
-            # Embeddings
-            f.write("3. EMBEDDINGS\n")
-            f.write("-" * 80 + "\n")
-            f.write(f"Model: {self.validation_report.get('model_name', 'N/A')}\n")
-            f.write(f"Dimension: {self.validation_report.get('embedding_dimension', 'N/A')}\n")
-            f.write(f"Total Embeddings: {self.validation_report.get('total_embeddings', 'N/A')}\n\n")
-            
-            # Vector Store
-            f.write("4. VECTOR STORE\n")
-            f.write("-" * 80 + "\n")
-            f.write(f"Index Type: {self.validation_report.get('index_type', 'N/A')}\n")
-            f.write(f"Total Vectors: {self.validation_report.get('total_vectors', 'N/A')}\n")
-            f.write(f"Metric: {self.validation_report.get('metric', 'N/A')}\n\n")
-            
-            # Artifacts
-            f.write("5. OUTPUT ARTIFACTS\n")
-            f.write("-" * 80 + "\n")
-            artifacts = self.validation_report.get('artifacts', {})
-            for key, value in artifacts.items():
-                f.write(f"{key}: {value}\n")
-            
-            f.write("\n" + "="*80 + "\n")
-            f.write("END OF REPORT\n")
-            f.write("="*80 + "\n")
+        Returns:
+        --------
+        Dict
+            Query interpretation
+        """
+        query_lower = query.lower()
+        
+        interpretation = {
+            'is_statistical': any(word in query_lower for word in 
+                                 ['average', 'mean', 'total', 'count', 'how many', 'top']),
+            'is_explanatory': any(word in query_lower for word in 
+                                 ['why', 'explain', 'show similar', 'pattern', 'reason']),
+            'is_demographic_focused': any(word in query_lower for word in 
+                                         ['age', 'gender', 'income', 'credit score']),
+            'is_status_focused': any(word in query_lower for word in 
+                                    ['approved', 'rejected', 'pending', 'status']),
+            'raw_query': query
+        }
+        
+        return interpretation
     
-    def _test_search(self):
-        """Step 6: Test the search functionality"""
-        print("\n" + "="*80)
-        print("STEP 6: TESTING SEARCH FUNCTIONALITY")
-        print("="*80)
-        
-        query = "Home loan with high CIBIL score"
-        print(f"\n🔍 Testing search with query: '{query}'")
-        
-        # Encode the query
-        query_embedding = self.embedding_generator.encode_query(query, normalize=True)
-        
-        # Search
-        distances, indices = self.vector_store.search(query_embedding, k=3)
-        
-        print(f"\n📋 Top 3 results:")
-        for i, (dist, idx) in enumerate(zip(distances[0], indices[0]), 1):
-            print(f"\n{i}. Similarity: {dist:.4f}")
-            print(f"   Loan ID: {self.processed_df.iloc[idx]['Loan_ID']}")
-            print(f"   Customer: {self.processed_df.iloc[idx]['Customer_Name']}")
-            print(f"   Purpose: {self.processed_df.iloc[idx]['Purpose_of_Loan']}")
-            print(f"   Status: {self.processed_df.iloc[idx]['Loan_Status']}")
-            print(f"   Text: {self.processed_df.iloc[idx]['text_representation'][:150]}...")
-        
-        return self
+    def get_retrieval_history(self) -> List[Dict]:
+        """Get all retrieval history"""
+        return [result.to_dict() for result in self.retrieval_history]
+    
+    def save_retrieval_history(self, filepath: str) -> None:
+        """Save retrieval history to JSON file"""
+        with open(filepath, 'w') as f:
+            json.dump(self.get_retrieval_history(), f, indent=2)
+        print(f"[OK] Saved retrieval history to {filepath}")
 
 
-def main():
-    """Main execution function"""
-    # Configuration
-    CSV_PATH = 'hdfc_loan_dataset_full_enriched - hdfc_loan_dataset_full_enriched.csv'
-    OUTPUT_DIR = './output'
-    MODEL_NAME = 'sentence-transformers/all-MiniLM-L6-v2'
+def create_retriever_from_pipeline(pipeline_output_dir: str, 
+                                  embedding_generator) -> LoanRAGRetriever:
+    """
+    Factory function to create retriever from existing pipeline output
     
-    # Create and run pipeline
-    pipeline = LoanRAGPipeline(
-        csv_path=CSV_PATH,
-        output_dir=OUTPUT_DIR,
-        model_name=MODEL_NAME
+    Parameters:
+    -----------
+    pipeline_output_dir : str
+        Path to pipeline output directory
+    embedding_generator : EmbeddingGenerator
+        The embedding generator instance
+        
+    Returns:
+    --------
+    LoanRAGRetriever
+        Initialized retriever
+    """
+    from pathlib import Path
+    from .data_loader import LoanDataLoader
+    from .vector_store import FAISSVectorStore
+    
+    output_dir = Path(pipeline_output_dir)
+    
+    # Load data
+    df = pd.read_csv(output_dir / 'processed_loan_data_with_embeddings.csv')
+    
+    # Load embeddings
+    embeddings = np.load(output_dir / 'loan_embeddings.npy')
+    
+    # Create FAISS index
+    faiss_store = FAISSVectorStore()
+    faiss_store.create_index(embeddings, index_type='flat')
+    
+    # Create LangChain components
+    loan_embeddings = LoanEmbeddings(embedding_generator)
+    vector_store = LoanFAISSVectorStore.from_embeddings(
+        texts=df['text_representation'].tolist(),
+        embeddings=loan_embeddings,
+        df=df,
+        index=faiss_store.index,
+        embedding_array=embeddings
     )
     
-    pipeline.run_full_pipeline()
-
-
-if __name__ == "__main__":
-    main()
+    # Create retriever
+    retriever = LoanRAGRetriever(vector_store, embedding_generator, df)
+    
+    return retriever
