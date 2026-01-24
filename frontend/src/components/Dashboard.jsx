@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react';
 import StatsCard from './StatsCard';
-import LiveMetrics from './LiveMetrics';
-import InteractiveFilters from './InteractiveFilters';
-import LiveSearchTable from './LiveSearchTable';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { fetchDashboardStats } from '../services/loanInsightsApi';
 
@@ -70,12 +67,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Live Metrics - Real-time updates */}
-      <LiveMetrics />
-
-      {/* Interactive Filters */}
-      <InteractiveFilters onFilterChange={(filters) => console.log('Filters changed:', filters)} />
-
+      
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
@@ -176,7 +168,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* System Health (Static for now, but good to keep for layout) */}
+        {/* System Health (Real status) */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">System Health</h2>
           <div className="space-y-4">
@@ -189,10 +181,10 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                 <span className="text-sm font-medium text-gray-700">Database</span>
               </div>
-              <span className="text-sm font-semibold text-green-600">Connected</span>
+              <span className="text-sm font-semibold text-red-600">Not Connected</span>
             </div>
           </div>
            
