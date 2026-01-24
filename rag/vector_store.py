@@ -34,7 +34,7 @@ class FAISSVectorStore:
         nprobe : int
             Number of clusters to search in IVF index
         """
-        print(f"\n📊 Creating FAISS index (type: {index_type})...")
+        print(f"\n[FAISS] Creating FAISS index (type: {index_type})...")
         
         self.embeddings = embeddings
         dimension = embeddings.shape[1]
@@ -80,7 +80,7 @@ class FAISSVectorStore:
             self.metadata['nlist'] = nlist
             self.metadata['nprobe'] = nprobe
         
-        print(f"✅ FAISS index created with {self.index.ntotal} vectors")
+        print(f"[OK] FAISS index created with {self.index.ntotal} vectors")
         
         return self
     
@@ -146,7 +146,7 @@ class FAISSVectorStore:
         
         filepath = Path(filepath)
         faiss.write_index(self.index, str(filepath))
-        print(f"✅ Saved FAISS index to {filepath}")
+        print(f"[OK] Saved FAISS index to {filepath}")
         
         return self
     
@@ -159,7 +159,7 @@ class FAISSVectorStore:
         self.metadata['index_type'] = str(type(self.index).__name__)
         self.metadata['total_vectors'] = self.index.ntotal
         
-        print(f"✅ Loaded FAISS index from {filepath}")
+        print(f"[OK] Loaded FAISS index from {filepath}")
         print(f"   Index type: {self.metadata['index_type']}")
         print(f"   Total vectors: {self.metadata['total_vectors']}")
         

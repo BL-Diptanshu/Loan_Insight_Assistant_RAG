@@ -8,12 +8,12 @@ numpy>=1.23.0
 sentence-transformers>=2.2.0
 torch>=2.0.0
 
-# Vector database and similarity search
-faiss-cpu>=1.7.4
+# LangChain framework for RAG
+langchain-core>=0.1.0
+langchain-community>=0.0.10
 
-# Optional: For GPU acceleration (uncomment if needed)
-# faiss-gpu>=1.7.4
+# Groq API for LLM
+groq>=0.4.0
 
-# Utilities
-tqdm>=4.65.0
-scikit-learn>=1.2.0
+# FAISS for vector search
+faiss-cpu>=1.7.0

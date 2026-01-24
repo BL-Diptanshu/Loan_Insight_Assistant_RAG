@@ -19,9 +19,9 @@ class EmbeddingGenerator:
         
     def load_model(self):
         """Load the sentence transformer model"""
-        print(f"\n🤖 Loading embedding model: {self.model_name}...")
+        print(f"\n[MODEL] Loading embedding model: {self.model_name}...")
         self.model = SentenceTransformer(self.model_name)
-        print(f"✅ Model loaded successfully")
+        print(f"[OK] Model loaded successfully")
         return self
     
     def generate_embeddings(self, texts, batch_size=32, normalize=True, show_progress=True):
@@ -44,7 +44,7 @@ class EmbeddingGenerator:
         numpy.ndarray
             Array of embeddings with shape (len(texts), embedding_dim)
         """
-        print(f"\n🔢 Generating embeddings for {len(texts)} texts...")
+        print(f"\n[EMBED] Generating embeddings for {len(texts)} texts...")
         
         if self.model is None:
             self.load_model()
@@ -66,7 +66,7 @@ class EmbeddingGenerator:
         self.metadata['normalized'] = normalize
         self.metadata['batch_size'] = batch_size
         
-        print(f"✅ Generated {self.embeddings.shape[0]} embeddings of dimension {self.embeddings.shape[1]}")
+        print(f"[OK] Generated {self.embeddings.shape[0]} embeddings of dimension {self.embeddings.shape[1]}")
         
         return self.embeddings
     
@@ -103,13 +103,13 @@ class EmbeddingGenerator:
             raise ValueError("No embeddings to save. Generate embeddings first.")
         
         np.save(filepath, self.embeddings)
-        print(f"✅ Saved embeddings to {filepath}")
+        print(f"[OK] Saved embeddings to {filepath}")
         return self
     
     def load_embeddings(self, filepath):
         """Load embeddings from a numpy file"""
         self.embeddings = np.load(filepath)
-        print(f"✅ Loaded embeddings from {filepath}")
+        print(f"[OK] Loaded embeddings from {filepath}")
         print(f"   Shape: {self.embeddings.shape}")
         return self
     
