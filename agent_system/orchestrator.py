@@ -41,12 +41,31 @@ class AgentOrchestrator:
 
 # Simple entry point for testing
 def run_orchestrator():
+    print("Initializing Agent Orchestrator...")
     orchestrator = AgentOrchestrator()
-    query = input("Enter loan query: ")
-    if query:
-        response = orchestrator.pydantic_ai_pipeline(UserQueryInput(query_text=query))
-        print("\n=== FINAL RESPONSE ===")
-        print(response.model_dump_json(indent=2))
+    print("\n=== AGENT SYSTEM READY ===")
+    print("Type 'exit' or 'quit' to stop.\n")
+    
+    while True:
+        try:
+            query = input("Enter loan query: ").strip()
+            if query.lower() in ('exit', 'quit'):
+                print("Exiting...")
+                break
+            
+            if not query:
+                continue
+                
+            response = orchestrator.pydantic_ai_pipeline(UserQueryInput(query_text=query))
+            print("\n=== FINAL RESPONSE ===")
+            print(response.model_dump_json(indent=2))
+            print("-" * 50 + "\n")
+            
+        except KeyboardInterrupt:
+            print("\nGoodbye!")
+            break
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     run_orchestrator()
