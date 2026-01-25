@@ -271,43 +271,55 @@ The application is deployed using a modern cloud infrastructure:
 
 ### **Arvind**
 
-Implemented the **Core RAG Logic integration layer** by connecting the retriever pipeline to the backend flow, ensuring query-to-retrieval works reliably with top-K similarity search and structured results. Built the full **Agentic Logic layer** using PydanticAI, including the Query Understanding Agent to interpret user queries and extract intent, the Loan Retrieval Agent to fetch relevant historical loan cases using FAISS similarity search, and the Explanation & Compliance Agent to convert retrieved evidence into structured, audit-friendly explanations. Defined and enforced **Pydantic validation schemas** across the agent pipeline and final API response formats to ensure strict response correctness and stability. Implemented the **agent orchestration logic**, controlling end-to-end flow between agents, including fallbacks for ambiguous queries and empty retrieval cases. Owned and executed the **CI/CD pipeline setup** using GitHub Actions, including automated checks for dependency installation, linting, backend unit tests, Docker build validation, and deployment automation. Led **final deployment and release readiness** by deploying the backend to Railway and frontend to Vercel, ensuring production health checks, smoke tests, and end-to-end workflow validation were successful. Delivered final production outputs including live deployment URLs, updated repository state, and comprehensive documentation for setup and usage.
+Implemented the Core RAG Logic integration layer by connecting the retriever pipeline to the backend flow, ensuring query-to-retrieval works reliably with top-K similarity search and structured results.
+Built the full Agentic Logic layer using PydanticAI, including the Query Understanding Agent to interpret user queries and extract intent, the Loan Retrieval Agent to fetch relevant historical loan cases using FAISS similarity search, and the Explanation & Compliance Agent to convert retrieved evidence into structured, audit-friendly explanations.
+Defined and enforced Pydantic validation schemas across the agent pipeline and final API response formats to ensure strict response correctness and stability.
+Implemented the agent orchestration logic, controlling end-to-end flow between agents, including fallbacks for ambiguous queries and empty retrieval cases.
+Owned and executed the CI/CD pipeline setup using GitHub Actions, including automated checks for dependency installation, linting, backend unit tests, Docker build validation, and deployment automation.
+Led final deployment and release readiness by deploying the backend to Railway and frontend to Vercel, ensuring production health checks, smoke tests, and end-to-end workflow validation were successful.
+Delivered final production outputs including live deployment URLs, updated repository state, and comprehensive documentation for setup and usage.
 
 ---
 
 ### **Mohith**
 
-Implemented and validated the RAG retriever pipeline, including similarity search setup, top-K retrieval behavior, retriever testing utilities, and query test cases. Documented retrieval behavior and patterns to support consistent query handling and tuning across the system.
+Implemented and validated the RAG retriever pipeline, including similarity search setup, top-K retrieval behavior, retriever testing utilities, and query test cases.
+Documented retrieval behavior and patterns to support consistent query handling and tuning across the system, ensuring the retrieval layer performs optimally under various query conditions.
 
 ---
 
 ### **Raj**
 
-Led dataset-side engineering and quality preparation by validating raw loan dataset structure, preparing text representations and feature engineering strategy to support strong retrieval quality, and supporting embedding/index readiness requirements. Collaborated in the Agent Logic phase, especially around response structure and correctness, ensuring outputs remained aligned with audit/compliance intent and schema constraints.
+Led dataset-side engineering and quality preparation by validating raw loan dataset structure, preparing text representations and feature engineering strategy to support strong retrieval quality, and supporting embedding/index readiness requirements.
+Collaborated in the Agent Logic phase, especially around response structure and correctness, ensuring outputs remained aligned with audit/compliance intent and schema constraints for production reliability.
 
 ---
 
 ### **Nishanth**
 
-Worked on dataset exploration and validation support, including ensuring clean ingestion readiness for downstream processing. Implemented backend API delivery by contributing to FastAPI endpoints such as loan data upload flow, query endpoint wiring, error handling, and endpoint-level validations. Supported API test readiness and helped ensure Swagger/OpenAPI documentation usability.
+Worked on dataset exploration and validation support, including ensuring clean ingestion readiness for downstream processing and data quality checks.
+Implemented backend API delivery by contributing to FastAPI endpoints such as loan data upload flow, query endpoint wiring, error handling, and endpoint-level validations, while supporting API test readiness and helping ensure Swagger/OpenAPI documentation usability.
 
 ---
 
 ### **Ravdeep**
 
-Implemented and strengthened the FastAPI server layer by building key endpoint flows and wiring backend services, improving error handling, stability, and response structure, and contributing to unit tests and API test coverage. Helped ensure the API is production-ready for frontend integration and deployment.
+Implemented and strengthened the FastAPI server layer by building key endpoint flows and wiring backend services, improving error handling, stability, and response structure.
+Contributed to unit tests and API test coverage, helping ensure the API is production-ready for frontend integration and deployment with robust error handling and logging mechanisms.
 
 ---
 
 ### **Ankush**
 
-Built the React frontend experience including query input workflow, response rendering UX, loading/error states, and basic UI structure for demo flow. Integrated frontend with backend APIs using Axios and ensured smooth user interaction across all components.
+Built the React frontend experience including query input workflow, response rendering UX, loading/error states, and basic UI structure for demo flow.
+Integrated frontend with backend APIs using Axios and ensured smooth user interaction across all components, implementing responsive design patterns and user-friendly error messaging for enhanced user experience.
 
 ---
 
 ### **Shashwat**
 
-Supported frontend integration and UI completion by connecting UI state management and API caching behavior using TanStack Query where applicable, assisting with manual integration testing, and polishing UI flow for demo readiness and reliability.
+Supported frontend integration and UI completion by connecting UI state management and API caching behavior using TanStack Query where applicable, ensuring efficient data fetching and state synchronization.
+Assisted with manual integration testing and polished UI flow for demo readiness and reliability, implementing performance optimizations and ensuring cross-browser compatibility.
 
 ---
 
