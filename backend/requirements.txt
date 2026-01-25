@@ -28,6 +28,7 @@ python-dotenv==1.0.0
 fastapi==0.103.0
 uvicorn[standard]==0.23.2
 python-multipart==0.0.6
+httpx==0.24.1  # Pin for TestClient compatibility
 
 # Explicitly avoid heavy dependencies
 transformers==4.31.0
