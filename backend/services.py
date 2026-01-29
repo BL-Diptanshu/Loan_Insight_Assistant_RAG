@@ -1,11 +1,11 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from typing import Optional
-from .models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse, LoanStatusDistributionResponse, AverageCIBILResponse, RejectionPurposeResponse
-from .api import loan_api
-from .analytics import analytics_service
-from .auth.jwt_handler import get_current_user_optional, UserInfo
-from .database import UserRepository, HistoryRepository
-from .database.history_schema import HistoryEntryCreate, QueryType
+from models import QueryRequest, QueryResponse, HealthResponse, UploadResponse, DashboardStatsResponse, LoanStatusDistributionResponse, AverageCIBILResponse, RejectionPurposeResponse
+from api import loan_api
+from analytics import analytics_service
+from auth.jwt_handler import get_current_user_optional, UserInfo
+from database import UserRepository, HistoryRepository
+from database.history_schema import HistoryEntryCreate, QueryType
 import shutil
 import os
 from pathlib import Path
