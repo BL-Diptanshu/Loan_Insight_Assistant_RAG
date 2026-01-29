@@ -30,6 +30,7 @@ uvicorn[standard]==0.23.2
 python-multipart==0.0.6
 httpx==0.24.1  # Pin for TestClient compatibility
 pydantic-settings==2.0.3  # Required for auth config
+email-validator==2.0.0  # Required for pydantic EmailStr validation
 
 # Explicitly avoid heavy dependencies
 transformers==4.31.0
@@ -43,3 +44,9 @@ pymongo==4.5.0
 # Authentication
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+authlib==1.2.1  # For OAuth
+itsdangerous==2.1.2  # For session management
+
+# Additional utilities
+requests==2.31.0  # For HTTP requests in OAuth flow
+
