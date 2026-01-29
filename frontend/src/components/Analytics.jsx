@@ -46,22 +46,23 @@ const Analytics = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="flex items-center justify-between">
+      <div className="glass-dark neon-border rounded-xl p-6 card-hover">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Analytics Overview</h2>
-            <p className="text-gray-600">Key insights into loan decision patterns and trends</p>
+            <h2 className="text-2xl font-bold gradient-text mb-2">Analytics Overview</h2>
+            <p className="text-gray-300">Key insights into loan decision patterns and trends</p>
           </div>
           <div className="flex items-center space-x-3">
-            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50">
               <option>Last 6 Months</option>
               <option>Last 3 Months</option>
               <option>Last Month</option>
               <option>Last Week</option>
             </select>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all flex items-center space-x-2 neon-glow group">
+              <svg className="w-4 h-4 transition-transform group-hover:translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7 10l5 5 5-5M12 15V3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <span>Export Report</span>
             </button>
@@ -71,56 +72,67 @@ const Analytics = () => {
 
       {/* Key Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+        <div className="glass-dark border border-blue-500/30 rounded-xl p-6 text-white card-hover group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-blue-100 text-sm font-medium">Total Cases</span>
-            <svg className="w-8 h-8 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+            <span className="text-blue-300 text-sm font-medium">Total Cases</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M7 7h10M7 12h10M7 17h6" strokeLinecap="round" />
+              </svg>
+            </div>
           </div>
           <p className="text-3xl font-bold mb-1">9,432</p>
-          <p className="text-blue-100 text-sm">+12.5% from last period</p>
+          <p className="text-blue-400 text-sm">+12.5% from last period</p>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
+        <div className="glass-dark border border-green-500/30 rounded-xl p-6 text-white card-hover group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-green-100 text-sm font-medium">Approval Rate</span>
-            <svg className="w-8 h-8 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <span className="text-green-300 text-sm font-medium">Approval Rate</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
           </div>
           <p className="text-3xl font-bold mb-1">74.8%</p>
-          <p className="text-green-100 text-sm">+2.3% from last period</p>
+          <p className="text-green-400 text-sm">+2.3% from last period</p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+        <div className="glass-dark border border-purple-500/30 rounded-xl p-6 text-white card-hover group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-purple-100 text-sm font-medium">Avg Confidence</span>
-            <svg className="w-8 h-8 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
+            <span className="text-purple-300 text-sm font-medium">Avg Confidence</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7 16l4-4 4 4 5-6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
           </div>
           <p className="text-3xl font-bold mb-1">87.3%</p>
-          <p className="text-purple-100 text-sm">+3.1% from last period</p>
+          <p className="text-purple-400 text-sm">+3.1% from last period</p>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+        <div className="glass-dark border border-orange-500/30 rounded-xl p-6 text-white card-hover group">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-orange-100 text-sm font-medium">Total Queries</span>
-            <svg className="w-8 h-8 text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
+            <span className="text-orange-300 text-sm font-medium">Total Queries</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.557 1.522 4.82 3.889 6.115l-.78 3.77 4.076-2.131c.588.086 1.193.131 1.815.131 4.97 0 9-3.185 9-7.115S16.97 3 12 3z" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
           </div>
           <p className="text-3xl font-bold mb-1">1,247</p>
-          <p className="text-orange-100 text-sm">+18.7% from last period</p>
+          <p className="text-orange-400 text-sm">+18.7% from last period</p>
         </div>
       </div>
 
       {/* Charts Row 1: Loan Type Distribution & Approval vs Rejection */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Loan Type Distribution - Pie Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Loan Type Distribution</h3>
+        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
+          <h3 className="text-lg font-bold text-white mb-4">Loan Type Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -128,7 +140,7 @@ const Analytics = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
@@ -137,7 +149,14 @@ const Analytics = () => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                  border: '1px solid rgba(59, 130, 246, 0.3)', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-4 space-y-2">
@@ -145,26 +164,31 @@ const Analytics = () => {
               <div key={index} className="flex items-center justify-between text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                  <span className="text-gray-700">{item.name}</span>
+                  <span className="text-gray-300">{item.name}</span>
                 </div>
-                <span className="font-semibold text-gray-900">{item.value.toLocaleString()}</span>
+                <span className="font-semibold text-white">{item.value.toLocaleString()}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Approval vs Rejection Trends - Area Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Approval vs Rejection Trends</h3>
+        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
+          <h3 className="text-lg font-bold text-white mb-4">Approval vs Rejection Trends</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={approvalTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+              <XAxis dataKey="month" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
+              <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                contentStyle={{ 
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                  border: '1px solid rgba(59, 130, 246, 0.3)', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ color: '#9ca3af' }} />
               <Area type="monotone" dataKey="approved" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="Approved" />
               <Area type="monotone" dataKey="rejected" stackId="1" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} name="Rejected" />
             </AreaChart>
@@ -175,15 +199,20 @@ const Analytics = () => {
       {/* Charts Row 2: Daily Query & Income Range */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Daily Query Activity - Bar Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Query Activity (Last 7 Days)</h3>
+        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
+          <h3 className="text-lg font-bold text-white mb-4">Daily Query Activity (Last 7 Days)</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={dailyQueryData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="day" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+              <XAxis dataKey="day" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
+              <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                contentStyle={{ 
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                  border: '1px solid rgba(59, 130, 246, 0.3)', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
               />
               <Bar dataKey="queries" fill="#3b82f6" name="Queries" radius={[8, 8, 0, 0]} />
             </BarChart>
@@ -191,17 +220,22 @@ const Analytics = () => {
         </div>
 
         {/* Approval by Income Range - Bar Chart */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Approval by Income Range</h3>
+        <div className="glass-dark neon-border rounded-xl p-6 card-hover">
+          <h3 className="text-lg font-bold text-white mb-4">Approval by Income Range</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={incomeRangeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="range" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+              <XAxis dataKey="range" stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
+              <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af' }} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                contentStyle={{ 
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
+                  border: '1px solid rgba(59, 130, 246, 0.3)', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ color: '#9ca3af' }} />
               <Bar dataKey="approved" fill="#10b981" name="Approved" radius={[8, 8, 0, 0]} />
               <Bar dataKey="rejected" fill="#ef4444" name="Rejected" radius={[8, 8, 0, 0]} />
             </BarChart>
@@ -211,45 +245,47 @@ const Analytics = () => {
 
       {/* Insights Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+        <div className="glass-dark border border-blue-500/30 rounded-xl p-6 card-hover group">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center animate-float transition-transform group-hover:scale-110">
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M13 17l5-5-5-5M6 17l5-5-5-5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h4 className="font-bold text-gray-900">Peak Performance</h4>
+            <h4 className="font-bold text-white">Peak Performance</h4>
           </div>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-300">
             Friday shows highest query volume with 234 queries, indicating peak user activity.
           </p>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+        <div className="glass-dark border border-green-500/30 rounded-xl p-6 card-hover group">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center animate-float transition-transform group-hover:scale-110" style={{animationDelay: '0.2s'}}>
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h4 className="font-bold text-gray-900">Top Performer</h4>
+            <h4 className="font-bold text-white">Top Performer</h4>
           </div>
-          <p className="text-sm text-gray-700">
-            Home loans represent 37.5% of all queries with highest approval rates in $70k+ income range.
+          <p className="text-sm text-gray-300">
+            Home loans represent 37.5% of all queries with highest approval rates in ₹70k+ income range.
           </p>
         </div>
 
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
+        <div className="glass-dark border border-orange-500/30 rounded-xl p-6 card-hover group">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center animate-float transition-transform group-hover:scale-110" style={{animationDelay: '0.4s'}}>
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 6v2m0 8v2" strokeLinecap="round" />
+                <path d="M9 10c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2s-.9 2-2 2h-2c-1.1 0-2 .9-2 2s.9 2 2 2h2c1.1 0 2-.9 2-2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h4 className="font-bold text-gray-900">Income Insight</h4>
+            <h4 className="font-bold text-white">Income Insight</h4>
           </div>
-          <p className="text-sm text-gray-700">
-            Clear correlation: Higher income ranges show significantly better approval rates (93.8% for $100k+).
+          <p className="text-sm text-gray-300">
+            Clear correlation: Higher income ranges show significantly better approval rates (93.8% for ₹100k+).
           </p>
         </div>
       </div>
