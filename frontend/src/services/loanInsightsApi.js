@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+// Ensure no trailing slash in the API_BASE_URL to prevent double slashes (e.g. //query)
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/$/, '');
 
 export const fetchDashboardStats = async () => {
   try {

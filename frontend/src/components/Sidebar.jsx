@@ -52,7 +52,10 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen }) => {
     >
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
-        <div className="flex items-center space-x-3">
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className="flex items-center space-x-3 w-full hover:opacity-80 transition-opacity cursor-pointer"
+        >
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30 animate-scale-pulse">
             <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinecap="round" strokeLinejoin="round" />
@@ -64,7 +67,7 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen }) => {
             <h1 className="text-lg font-bold gradient-text">Loan Insights</h1>
             <p className="text-xs text-gray-400">AI Assistant</p>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Navigation */}
